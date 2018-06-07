@@ -1,0 +1,31 @@
+---
+- name: mail notification for patching
+  shell: /var/lib/rundeck/playbooks/scripts/mailscript.sh {{ inventory_hostname }}
+  register: mailresult
+  delegate_to: localhost
+  tags: mailtest
+  vars:
+    ansible_become: no
+- debug: msg="{{mailresult.stdout}}"
+  tags: mailtest
+- name: Truncate logs
+  shell: "/usr/bin/truncate -s 0 /tmp/ansible_mail.log"
+#  run_once: true
+  delegate_to: localhost
+  tags: mailtest
+  vars:
+    ansible_become: no
+
+- lineinfile: create=yes dest=/tmp/ansible_mail.log line="{{mailresult.stdout}}" state=present
+  delegate_to: localhost
+  tags: mailtest
+  vars:
+    ansible_become: no
+   
+- name: Patching Result
+  shell: cat /var/lib/rundeck/playbooks/scripts/mailbody.txt /tmp/ansible_mail.log|mailx -s "Rundeck - patch result" ragul.balakrishnan@nike.com
+  run_once: true
+  delegate_to: localhost
+  tags: mailtest
+  vars:
+    ansible_become: no

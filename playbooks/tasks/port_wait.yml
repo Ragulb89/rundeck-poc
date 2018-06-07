@@ -1,0 +1,10 @@
+---
+- name: wait for server to come back
+  local_action: wait_for host={{ ansible_host | default(inventory_hostname,boolean=True) }}
+    port=22
+    delay=300
+    timeout=600
+    state=started
+  become: false
+  register: waitfor
+  ignore_errors: true

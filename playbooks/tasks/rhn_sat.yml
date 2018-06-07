@@ -1,0 +1,11 @@
+---
+- name: set channel name
+  set_fact:
+    channel: "rhel{{ ansible_distribution_major_version }}_{{ quarters[month].qyear }}_{{ quarters[month].qmonth }}"
+- name: register to channel using activationkey
+  command: rhnreg_ks --force --username={{ sat_user }} --password={{ sat_pass }} --activationkey 1-{{ channel }}
+  register: rhnreg_result
+  changed_when: "rhnreg_result.rc == 0"
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/sbin:/usr/sbin"
+  become: true

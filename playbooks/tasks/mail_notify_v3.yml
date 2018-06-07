@@ -1,0 +1,31 @@
+---
+- hosts: all
+  tasks:
+  - name: mail notification for patching
+    shell: /var/lib/rundeck/playbooks/scripts/mailscript.sh {{ inventory_hostname }}
+    register: mailresult
+    delegate_to: localhost
+    tags: mailtest
+  - debug: msg="{{mailresult.stdout}}"
+    tags: mailtest
+  - name: Truncate logs
+    shell: "/usr/bin/truncate -s 0 /tmp/ansible.log"
+    run_once: true
+    delegate_to: localhost
+    tags: mailtest
+  - lineinfile: create=yes dest=/tmp/ansible.log line="{{mailresult.stdout}}" state=present
+    run_once: true
+    delegate_to: localhost
+    tags: mailtest
+  - lineinfile: 
+      path: /tmp/ansible.log
+      line: 'Hello Team, Please refer the patching result as below. To view the detailed result, login to rundeck portal http://nke-lnx-dis-d111. For any questions/concerns please reach out to lst-techops.unixeng@nike.com'
+      insertbefore: BOF
+    run_once: true
+    delegate_to: localhost
+    tags: mailtest
+  - name: Patching Result
+    shell: cat /tmp/ansible.log|mailx -s "patch result" ragul.balakrishnan@nike.com
+    run_once: true
+    delegate_to: localhost
+    tags: mailtest

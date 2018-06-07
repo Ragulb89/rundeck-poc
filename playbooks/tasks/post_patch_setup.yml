@@ -1,0 +1,27 @@
+---
+- name: reboot after patching
+  command: "shutdown -r 0"
+  async: 0
+  poll: 0
+  ignore_errors: true
+  become: true
+  when: yum_update|succeeded
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/sbin:/usr/sbin"
+- name: wait for server to come back after yum update
+  local_action: wait_for host={{ ansible_host | default(inventory_hostname,boolean=True) }}
+    port=22
+    delay=300
+    timeout=600
+    state=started
+  become: false
+  register: waitfor
+  ignore_errors: true
+
+- name: Maintanence mode science logic turn off
+  shell: "{{ scilo_maint_off }} {{ inventory_hostname }}"
+  register: scilo_off
+  changed_when: "scilo_off.rc == 0"
+  ignore_errors: true
+  become: false
+  delegate_to: localhost

@@ -1,0 +1,9 @@
+---
+- name: reboot server
+  command: "shutdown -r 0"
+  async: 0
+  poll: 0
+  ignore_errors: true
+  become: true
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/sbin:/usr/sbin"

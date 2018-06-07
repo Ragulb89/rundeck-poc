@@ -1,0 +1,46 @@
+---
+quarters:
+  January:
+    qmonth: "11"
+    qyear: "{{ lookup('pipe','date -d \"last year\" +%Y') }}"
+  February:
+    qmonth: "02"
+    qyear: "{{ lookup('pipe','date +%Y') }}"
+  March:
+    qmonth: "02"
+    qyear: "{{ lookup('pipe','date +%Y') }}"
+  April:
+    qmonth: "02"
+    qyear: "{{ lookup('pipe','date +%Y') }}"
+  May:
+    qmonth: "05"
+    qyear: "{{ lookup('pipe','date +%Y') }}"
+  June:
+    qmonth: "05"
+    qyear: "{{ lookup('pipe','date +%Y') }}"
+  July:
+    qmonth: "05"
+    qyear: "{{ lookup('pipe','date +%Y') }}"
+  August:
+    qmonth: "08"
+    qyear: "{{ lookup('pipe','date +%Y') }}"
+  September:
+    qmonth: "08"
+    qyear: "{{ lookup('pipe','date +%Y') }}"
+  October:
+    qmonth: "08"
+    qyear: "{{ lookup('pipe','date +%Y') }}"
+  November:
+    qmonth: "11"
+    qyear: "{{ lookup('pipe','date +%Y') }}"
+  December:
+    qmonth: "11"
+    qyear: "{{ lookup('pipe','date +%Y') }}"
+yum_cache: "/var/cache/yum/*"
+yum_update_log: "/var/log/yum_update.log"
+month: "{{ lookup('pipe','date +%B') }}"
+chk_vm_hb: "../scripts/chk-vm-heartbeat"
+scilo_maint_on: "/var/lib/rundeck/playbooks/scripts/scilo-maint -e"
+scilo_maint_off: "/var/lib/rundeck/playbooks/scripts/scilo-maint -l"
+from_email: "Lst-Linux.Patch.Mgmt@nike.com"
+to_email: "Lst-Linux.Patch.Mgmt@nike.com"

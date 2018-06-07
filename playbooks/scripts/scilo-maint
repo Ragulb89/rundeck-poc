@@ -1,0 +1,59 @@
+#!/bin/bash
+
+#  scilo-maint
+#
+#  Script that puts a device in maintenance mode in Science Logic
+#  Input: name of a server, option to enable or disable mainenance mode
+
+real_path=$( readlink -f $0 )
+cd $( dirname $real_path )
+
+#source ./vars
+SCILO_URL="https://nike.sciencelogic.com"
+
+function show_usage {
+
+    echo "Usage:"
+    echo "$0 OPTION SERVER_NAME"
+    echo
+    echo "options:"
+    echo "-e         enter maintenance mode"
+    echo "-l         leave maintenance mode"
+    exit 1
+
+}
+
+[ $# -eq 0 ] && show_usage
+
+#  Evaluate the options received
+#  e to enter maintenance mode
+#  l to leave maintenance mode
+while getopts ":el" option
+do
+    case $option in
+        e) maintenance=1 ;;
+        l) maintenance=0 ;;
+        *) show_usage ;;
+    esac
+done
+
+shift
+
+serverName=$1
+
+#  Obtain the device key
+deviceKey=$( curl -k -v -H 'X-em7-beautify-response:1' -H 'Accept:application/xml' -H 'Authorization: Basic YS50ZWNoLnVuaXguYXBpOlBhaW5JblRoZUEkJA==' "$SCILO_URL/api/device?limit=100&filter.name=${serverName}&extended_fetch=1" 2>/dev/null| awk -F\" '/device key/ { print $2 }' )
+
+[ -z "$deviceKey" ] && echo "Device $serverName not in Science Logic" && exit 2
+
+#  Construnct the device URI
+deviceUri="$SCILO_URL$deviceKey"
+
+#  Use HTTP POST to update the device
+if curl -k -v -H 'Authorization: Basic YS50ZWNoLnVuaXguYXBpOlBhaW5JblRoZUEkJA=='  -H 'content-type:application/json' "$deviceUri" -d '{ "active": { "user-initiated-maintenance": '$maintenance' } }' 2>&1 | grep 'X-EM7-status-message:'
+then
+    exit
+else
+    exit 1
+fi
+

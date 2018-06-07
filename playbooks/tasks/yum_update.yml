@@ -1,0 +1,35 @@
+---
+- name: yum update
+  yum:
+    name: '*'
+    state: latest
+  register: yum_update
+  ignore_errors: yes
+  become: true
+
+- name: save yum update in {{yum_update_log}}
+  copy:
+    content: "{{ yum_update | replace('\\n','\n') }}"
+    dest: "{{ yum_update_log }}"
+    owner: root
+    group: unixeng
+    mode: 0664
+  become: true
+
+- name: email yum log on fail
+  local_action: shell echo "Rundeck - yum update failed, to troubleshoot look at {{ yum_update_log }}" | mailx -s "FAILED Patch on {{ inventory_hostname }} - yum update failed" -S from= "{{ from_email }}" "{{ to_email }}"
+  register: mailx
+  failed_when: mailx.rc == 0
+  when: yum_update|failed
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/sbin:/usr/sbin:/usr/bin"
+  become: false
+
+- name: email yum message when no update
+  local_action: shell echo -e "Rundeck - yum update:\n{{ yum_update.results | replace('\\n','\n') }}" | mailx -s "UNNEEDED Patch on {{ inventory_hostname }} - no packages to update" -S from= "{{ from_email }}" "{{ to_email }}"
+  register: mailx
+  when: not yum_update|changed
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/sbin:/usr/sbin:/usr/bin"
+  become: false
+

@@ -1,0 +1,11 @@
+Hello Team, 
+
+Please refer the patching result as below. 
+   
+To view the detailed result, login to rundeck portal http://nke-lnx-dis-d111. 
+
+For any questions/concerns please reach out to lst-techops.unixeng@nike.com
+
+
+--HOSTNAME-------------PATCH STATUS-----
+

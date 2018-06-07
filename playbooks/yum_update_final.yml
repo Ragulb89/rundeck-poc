@@ -1,0 +1,15 @@
+---
+- hosts: all
+  gather_facts: True
+  #gather_facts: False
+  vars_files:
+   - vars/patch_variables.yml
+   - host_vars/sat_login
+  tasks:
+#   - include_tasks: tasks/pre_patch_setup.yml
+#   - include_tasks: tasks/rhn_sat.yml
+#   - include_tasks: tasks/reboot.yml
+#   - include_tasks: tasks/port_wait.yml
+#   - include_tasks: tasks/yum_update.yml
+#   - include_tasks: tasks/post_patch_setup.yml
+   - include_tasks: tasks/mail_notify_v2.yml 

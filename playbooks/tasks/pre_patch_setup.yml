@@ -1,0 +1,16 @@
+---
+- name: get current time before reboot
+  command: date +%s
+  register: before_reboot
+
+- name: Maintanence mode science logic
+  shell: "{{ scilo_maint_on }} {{ inventory_hostname }}"
+  register: scilo_on
+  changed_when: "scilo_on.rc == 0"
+  ignore_errors: true
+  become: false
+  delegate_to: localhost
+
+- name: clean up {{ yum_cache }}
+  shell: "rm -rf {{ yum_cache }}"
+  become: true
